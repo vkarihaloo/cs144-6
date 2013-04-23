@@ -1,0 +1,45 @@
+Lab5 Readme 
+Yinan Na (nayinan@stanford.edu)
+
+[Summary]
+All the required NAT logic is implemented. I define a couple of functions in sr_nat.c file to decompose the Nat logic into small tasks. The decomposition is as following: 
+
+Receive a packet to forward
+  -> call translate_packet(), if a IP packet
+    -> call translate_tcp(), if a TCP packet
+      -> Inbound: lookup mapping table
+        -> if exists, update packet headers and connection state
+        -> if not exists, check if a unsolicited SYN
+          -> if a unsoclicited SYN, queue it
+          -> if not, drop it
+      -> Outbound: lookup mapping table
+        -> if exists, update packet headers and connection state
+        -> if not exists, insert a new mapping, then update packet headers
+    -> call translate_icmp(), if a ICMP packet
+      -> Inbound, lookup mapping table
+        -> if exists, update packet headers
+        -> if not exists, drop it
+      -> Outbound, lookup mapping table
+        -> if exists, update packet headers
+        -> if not exists, insert a new mapping, then update packet headers
+
+Periodic timout handling
+ICMP query id timeout
+TCP established timeout
+TCP transitory  timeout
+
+TCP state transition  
+To correctly handl time out, we define several tcp states and the FSM model for them: 
+syn_sent: already sent a SYN, waiting for a SYN-ACK
+syn_received: already received SYN-ACK, waiting for a confirming connection request ack
+fin_wait1: already sent a FIN, waiting a ACK  
+fin_wait2: already received ACK for FIN, waiting for a FIN requestion from other side 
+closed: connection closed 
+established: connection established 
+Based on each packet delivered, the state changes from one to another accordingly.
+
+[Testing]
+For ICMP, use ping command and wireshark to check the network flow.
+For TCP, use wget command and wireshark to check the network flow.
+For timeout, use python script from Piazza, also test it by dropping FIN packets.
+
