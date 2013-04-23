@@ -1,0 +1,31 @@
+Yinan Na (nayinan@stanford.edu) LAB 2 README
+
+In Lab2 
+
+/* Sliding Window */
+I implement sliding window using circular array data structure. There is a sendWindow array keeping the sent packets and a recvWindow array keeping the received packets (as output buffer). The circular array has a nice property to keep the packet with seqno N in the N%window_size position of the array. Then we keeps two array sendState and recvState to keep track of the states (sent or acked for sendWindow; received or output for recvWindow) of each packet in the sliding window. Along with the variables (SWS, LAR, LSS; RWS, LAS, LSR) introduced in class, we can keep good track of the states in both sender and recevier. 
+
+For time_out implementation, I create an array to keep timer of each packet in one connection. The timer increase as the interval of rel_timer. When the packet timer reach certain value, it checks and resends packet. 
+
+I create several helper functions to decompose the sliding window tasks. Besides, all the memory opened have been freed in rel_destory function.  
+
+/* Demux */
+In rel_demux, I first do the packet validation check. If it passes, it will get compared with all existing connections by socket address. If it is packet for an existing connection, just forward the packet to the corresponding connection. Otherwise, I create a new connection, then forward this packet to the new connection. 
+
+Valgrind Output:
+==2159== HEAP SUMMARY:
+==2159==     in use at exit: 280 bytes in 4 blocks
+==2159==   total heap usage: 16 allocs, 252,379 frees, 1,732 bytes allocated
+==2159== 
+==2159== LEAK SUMMARY:
+==2159==    definitely lost: 0 bytes in 0 blocks
+==2159==    indirectly lost: 0 bytes in 0 blocks
+==2159==      possibly lost: 0 bytes in 0 blocks
+==2159==    still reachable: 280 bytes in 4 blocks
+==2159==         suppressed: 0 bytes in 0 blocks
+==2159== Reachable blocks (those to which a pointer was found) are not shown.
+==2159== To see them, rerun with: --leak-check=full --show-reachable=yes
+==2159== 
+==2159== For counts of detected and suppressed errors, rerun with: -v
+==2159== Use --track-origins=yes to see where uninitialised values come from
+==2159== ERROR SUMMARY: 1045531 errors from 30 contexts (suppressed: 2 from 2)
